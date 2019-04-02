@@ -3,10 +3,9 @@ x0 = [-1; 1];
 B0 = eye(2);
 
 % Apply basic steepest descent algorithm
-theta = 0.1;
 tol = 1e-5;
 
-x = bfgs(@f_quad, @g_quad, x0, B0, theta, tol);
+x = bfgs_ex(@f_quad, @g_quad, x0, B0, tol);
 
 % Set exact solution
 xex = [1; 0];

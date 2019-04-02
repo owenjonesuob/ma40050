@@ -16,7 +16,7 @@ xex = [1; 1];
 visual(@f_rosen, x, x0, xex);
 
 n = size(x, 2);
-fprintf("Number of iterations: %d\n", n);
+fprintf("Number of iterations: %d\n", n-1);
 
 e = vecnorm(x - xex);
 fprintf("Final error: %e\n", e(n));

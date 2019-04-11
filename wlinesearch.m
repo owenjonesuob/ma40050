@@ -1,12 +1,12 @@
 function alpha = wlinesearch(x, f, df, s, theta_sd, theta_c)
 % Backtracking line search algorithm which guarantees Wolfe conditions
 
+% Check parameters are valid
 if 0 >= theta_sd || theta_sd >= theta_c || theta_c >= 1
     error("Please specify 0 < theta_sd < theta_c < 1")
 end
     
 % Initialise alpha and auxiliary variables
-% condition
 alpha = 1;
 a1 = 0;
 a2 = 0;

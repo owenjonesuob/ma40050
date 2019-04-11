@@ -81,7 +81,7 @@ Hence we have shown that $z^\top B_{n+1} z \geq 0$ for any $z \in \mathbb{R}^N$,
 
 #### (b)
 
-
+TODO
 
 
 
@@ -119,7 +119,17 @@ In this section we attempt to find an approximate minimum of the Rosenbrock func
 
 
 
-#### Part 5
+### Part 5
+
+#### (a)
+
+TODO
+
+
+
+#### (b)
+
+TODO
 
 
 
@@ -133,7 +143,19 @@ $$
 \alpha = \inf \left\{ a \geq 0 \ : \ p'(a) = 0 \right\}
 $$
 
-where we define $p(a) = f(x + as)$.
+where we define $p(a) = f(x + as)$. Note that $p'$ here is the derivative of $p$ with respect to $a$, and so by the chain rule, $p'(a) = s \cdot f'(x + as)$.
+
+The problem in question is 2-dimensional ($N = 2$), and therefore we expect that the algorithm will always terminate in at most two iterations. The following table shows that this is indeed the case for a range of initial guesses; the "final error" is the Euclidean norm of the difference between the final iteration $x$ and the exact solution $x^* = (1, 0)^\top$.
+
+
+$x_0^\top$  | Iterations | Final error
+------------|------------|-------------
+(1, 0)      | 0          | 0.000000e+00
+(0, 0)      | 2          | 2.775558e-17
+(-1, 1)     | 2          | 1.110223e-16
+(-2, 1)     | 2          | 1.665335e-16
+(-5, -5)    | 2          | 0.000000e+00
+(1e8, -1e8) | 2          | 1.535977e-08
 
 
 ![Solution path for BFGS with exact line search, $x_0 = (-1, 1)^\top$](images/part5.png){width=80%}

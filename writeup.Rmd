@@ -1,0 +1,237 @@
+---
+title: "MA40050 Assessed Coursework 2018"
+author: "Owen Jones {olj23}"
+output: pdf_document
+header-includes:
+    - \setlength{\jot}{15pt}
+---
+
+
+### Part 1
+
+Note that $A + U V^\top$ is invertible if and only if $(A + U V^\top)x = 0$ implies $x = 0$ for $x \in \mathbb{R}^N$.
+
+Consider $y$ such that $(A + U V^\top)y = 0$.
+
+We have assumed that $A$ is invertible and therefore that $A^{-1}$ exists; then, left-multiplying by $V^\top A^{-1}$,
+
+$$ \begin{aligned}
+0 &= V^\top A^{-1} (A + U V^\top) y \\
+&= V^\top y + V^\top A^{-1} U V^\top y \\
+&= (I + V^\top A^{-1} U) V^\top y
+\end{aligned} $$
+
+Since $(I + V^\top A^{-1} U)$ is invertible by assumption, we must have that $V^\top y = 0$. Then
+
+$$
+0 = (A + U V^\top) y = A y
+$$
+
+and therefore $y = 0$, since A is invertible. Hence $A + U V^\top$ is invertible.
+
+Subsequently observe that
+
+$$ \begin{aligned}
+&(A + U V^\top) \left( A^{-1} - A^{-1} U (I + V^\top A^{-1} U)^{-1} V^\top A^{-1} \right) \\
+&= I - U (I + V^\top A^{-1} U)^{-1} V^\top A^{-1} + U V^\top A^{-1} - U V^\top A^{-1} U (I + V^\top A^{-1} U)^{-1} V^\top A^{-1}) \\
+&= I + U \left( -(I + V^\top A^{-1} U)^{-1} + I - V^\top A^{-1} U (I + V^\top A^{-1} U)^{-1} \right) V^\top A^{-1} \\
+&= I + U \left( I - (I + V^\top A^{-1} U)(I + V^\top A^{-1} U)^{-1} \right) V^\top A^{-1} \\
+&= I
+\end{aligned} $$
+
+and therefore
+
+$$
+A^{-1} - A^{-1} U (I + V^\top A^{-1} U)^{-1} V^\top A^{-1} = (A + U V^\top)^{-1}
+$$
+
+
+
+### Part 2
+
+#### (a)
+
+Let $z \in \mathbb{R}^N$. Using the definition of $B_{n+1}$ and the $B_n$-norm,
+
+$$ \begin{aligned}
+z^\top B_{n+1} z &= z^\top \left( B_n - \frac{(B_n d_n)(B_n d_n)^\top}{d_n^\top B_n d_n} + \frac{y_n y_n^\top}{y_n^\top d_n} \right) z \\
+&= z^\top B_n z - \frac{z^\top B_n d_n d_n^\top B_n z}{d_n^\top B_n d_n} + \frac{z^\top y_n y_n^\top z}{y_n^\top d_n} \\
+&= \lVert z \rVert_{B_n}^2 - \frac{(z^\top B_n d_n)^2}{\lVert d_n \rVert_{B_n}^2} + \frac{(y_n^\top z)^2}{y_n^\top d_n} \\
+\end{aligned} $$
+
+Consider now the Cauchy-Schwarz inequality, which holds since $B_n$ is SPD by assumption, and which ensures that
+
+$$
+z^\top B_n d_n \leq \lVert z \rVert_{B_n} \lVert d_n \rVert_{B_n}
+$$
+
+Therefore
+
+$$ \begin{aligned}
+z^\top B_{n+1} z &\geq \lVert z \rVert_{B_n}^2 - \frac{\lVert z \rVert_{B_n}^2 \lVert d_n \rVert_{B_n}^2}{\lVert d_n \rVert_{B_n}^2} + \frac{(y_n^\top z)^2}{y_n^\top d_n} \\
+&= \frac{(y_n^\top z)^2}{y_n^\top d_n} \\
+&\geq 0
+\end{aligned}
+$$
+
+since it was assumed that $y_n^\top d_n \ge 0$. This assumption necessitates that $y \neq 0$, meaning that equality only holds when $z = 0$.
+
+Hence we have shown that $z^\top B_{n+1} z \geq 0$ for any $z \in \mathbb{R}^N$, and $z^\top B_{n+1} z = 0$ if and only if $z = 0$. In other words, $B_{n+1}$ is positive definite.
+
+
+#### (b)
+
+
+
+
+
+
+### Part 3
+
+_(Please see Appendix for associated code)_
+
+The aim is to find an approximate minimum of the quadratic function $f(x) = \frac{1}{2} x^\top A x + b^\top x$ on $\mathbb{R}^2$, where
+
+$$
+A = \begin{pmatrix} 2 & -1 \\ -1 & 10 \end{pmatrix} \qquad b = \begin{pmatrix} -2 \\ 1 \end{pmatrix}
+$$
+
+The backtracking line search requires the gradient function $f'$, which we know from previous work has the form $f'(x) = A x + b$.
+
+
+
+
+![Solution path for BFGS with backtracking line search, $x_0 = (-1, 1)^\top$](images/part3.png){width=80%}
+
+
+
+
+
+#### Part 4
+
+_(Please see Appendix for associated code)_
+
+In this section we attempt to find an approximate minimum of the Rosenbrock function $f(x) = (1 - x_1)^2 + 10(x_2 - x_1^2)^2$.
+
+
+
+![Solution path for BFGS with Wolfe line search, $x_0 = (-1.2, 1)^\top$](images/part3.png){width=80%}
+
+
+
+
+
+
+
+
+
+\pagebreak
+
+
+## Appendix
+
+#### `bfgs.m`
+
+```{octave bfgs, eval = FALSE}
+function all_x = bfgs(f, df, x0, B0, theta, tol)
+% Performs generalised steepest descent, using the BFGS method to update
+% an approximate Hessian matrix and returning a matrix of all iterates
+
+% Only permit a certain maximum number of iterations
+max_iters = 1000;
+% Ensure dimensions of inputs are correct
+[m, n] = size(x0);
+if n ~=  1
+    error("x0 must be a n*1 vector")
+elseif ~isequal(size(B0), [m, m])
+    error("B0 must be square and have same dimension as x0")
+end
+
+% Prepare array to store iterates
+all_x = NaN(m, max_iters+1);
+all_x(:, 1) = x0;
+
+% Set initial guesses
+x = x0;
+H = inv(B0);
+
+for k = 1:max_iters
+    
+    % Check convergence
+    if norm(df(x)) <= tol
+        break
+    end
+    
+    s = - H * df(x);
+    
+    % Find step size via linesearch
+    alpha = linesearch(x, f, df, s, theta);
+    
+    % Calculate new iterate and useful vectors
+    d = alpha .* s;
+    y = x;
+    x = x + d;
+    y = df(x) - df(y);
+    
+    % Store new iterate
+    all_x(:, k+1) = x;
+    
+    % Update H using SMW/BFGS method
+    rho = 1 / (y'*d);
+    H = (eye(m) - rho*(d*y')) * H * (eye(m) - rho*(y*d')) + rho*(d*d');
+end
+
+% Return all iterates
+all_x = all_x(:, 1:k);
+end
+```
+
+
+\pagebreak
+
+
+```{octave wlinesearch, eval = FALSE}
+function alpha = wlinesearch(x, f, df, s, theta_sd, theta_c)
+% Backtracking line search algorithm which guarantees Wolfe conditions
+
+% Check parameters are valid
+if 0 >= theta_sd || theta_sd >= theta_c || theta_c >= 1
+    error("Please specify 0 < theta_sd < theta_c < 1")
+end
+    
+% Initialise alpha and auxiliary variables
+alpha = 1;
+a1 = 0;
+a2 = 0;
+
+% Define indicator functions for Wolfe convergence conditions
+armijo = @(z, a) f(z + a*s) <= f(z) + theta_sd*a*(df(z)'*s);
+curvature = @(z, a) df(z + a*s)'*s >= theta_c*(df(z)'*s);
+
+% Adjust alpha until the conditions are satisfied; stop after a while
+for k = 1:100
+
+    if ~armijo(x, alpha)
+        % Reduce alpha
+        a2 = alpha;
+        alpha = 0.5*(a1 + a2);
+        
+    elseif ~curvature(x, alpha)
+        % Increase alpha
+        a1 = alpha;
+        if a2 == 0
+            alpha = 2*a1;
+        else
+            alpha = 0.5*(a1 + a2);
+        end
+        
+    else
+        % We satisfied both conditions!
+        break
+        
+    end
+    
+end
+
+end
+```

@@ -96,9 +96,32 @@ $$
 A = \begin{pmatrix} 2 & -1 \\ -1 & 10 \end{pmatrix} \qquad b = \begin{pmatrix} -2 \\ 1 \end{pmatrix}
 $$
 
-The backtracking line search requires the gradient function $f'$, which we know from previous work has the form $f'(x) = A x + b$.
 
 
+The quasi-Newton BFGS algorithm is used to iteratively update an initial guess $x_0$. A descent direction is calculated and the step size $\alpha$ in that direction can be determined by a line search algorithm - in this case, backtracking line search, which starts with a relatively large initial guess for $\alpha$ and then halves it until the descent condition is met:
+
+$$
+f(x + \alpha s) - f(x) < \alpha \theta_{sd} f'(x)^\top s
+$$
+
+for some specified constant $\theta_{sd}$. From previous work, we know $f'(x) = A x + b$.
+
+The following table shows the number of iterations the algorithm completes before convergence is achieved for a range of starting guesses $x_0$, using $\theta_{sd} = 0.1$, an initial approximate Hessian $B_0 = I$ and a convergence tolerance of $\epsilon = 10^{-5}$. The number of iterations performed by steepest descent (also with backtracking line search) and a simple Cauchy point trust region method are also shown.
+
+
+$x_0^\top$  | BFGS (backtracking) | Steepest descent | Trust region
+------------|---------------------|------------------|-------------
+(1, 0)      | 0                   | 0                | 0
+(0, 0)      | 4                   | 28               | 30
+(-1, 1)     | 4                   | 31               | 24
+(-2, 1)     | 4                   | 31               | 24
+(-5, -5)    | 5                   | 33               | 41
+(1e8, -1e8) | 9                   | 70               | 1000000+ (did not converge)
+
+
+The BFGS algorithm converges with many fewer iterations than either of the comparative algorithms; although despite the additional iterations, for this problem the other algorithms converge at more or less the same speed as the BFGS algorithm (~0.3 seconds for the starting guesses above), likely due to the additional work being done to update the approximate Hessian matrix at each BFGS iteration. It should however be noted that this is a fairly simple problem, and therefore convergence is achieved in a short period of time; greater discrepancies between the algorithms might be seen for higher-dimensional problems.
+
+The solution path of the BFGS algorithm with an initial guess of $x_0 = (-1, 1)^\top$ is shown in Figure 1.
 
 
 ![Solution path for BFGS with backtracking line search, $x_0 = (-1, 1)^\top$](images/part3.png){width=80%}
@@ -145,7 +168,7 @@ $$
 
 where we define $p(a) = f(x + as)$. Note that $p'$ here is the derivative of $p$ with respect to $a$, and so by the chain rule, $p'(a) = s \cdot f'(x + as)$.
 
-The problem in question is 2-dimensional ($N = 2$), and therefore we expect that the algorithm will always terminate in at most two iterations. The following table shows that this is indeed the case for a range of initial guesses; the "final error" is the Euclidean norm of the difference between the final iteration $x$ and the exact solution $x^* = (1, 0)^\top$.
+The problem in question is 2-dimensional ($N = 2$), and therefore we expect that the algorithm will always terminate in at most two iterations. The following table shows that this is indeed the case for the range of initial guesses which were considered in Part 3. The "final error" is the Euclidean norm of the difference between the final iteration $x$ and the exact solution $x^* = (1, 0)^\top$.
 
 
 $x_0^\top$  | Iterations | Final error

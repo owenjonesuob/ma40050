@@ -164,8 +164,29 @@ The solution path of the BFGS algorithm using Wolfe line search, with an initial
 
 #### (a)
 
-TODO
+Let $n < N$, $0 \leq k \leq n$ and let $j$ be arbitrarily chosen such that $0 \leq j \leq k$, $B_k$ be defined iteratively via the BFGS method with exact line search, and $B_0 = I$.
 
+Observe that, using the form of the BFGS update,
+
+$$ \begin{aligned}
+B_1 d_j &= \left( B_0 - \frac{(B_0 d_j) (B_0 d_j)^\top}{d_j^\top B_0 d_j} + \frac{y_j y_j^\top}{y_j^\top d_j} \right) d_j \\
+&= \left( I - \frac{d_j d_j^\top}{d_j^\top d_j} + \frac{y_j y_j^\top}{y_j^\top d_j} \right) d_j \\
+&= d_j - \frac{d_j d_j^\top d_j}{d_j^\top d_j} + \frac{y_j y_j^\top d_j}{y_j^\top d_j} \\
+&= d_j - d_j + y_j \\
+&= y_j
+\end{aligned} $$
+
+Then if we assume that $B_k d_j = y_j$, note that
+
+$$ \begin{aligned}
+B_{k+1} d_j &= \left( B_k - \frac{(B_k d_j) (B_k d_j)^\top}{d_j^\top B_k d_j} + \frac{y_j y_j^\top}{y_j^\top d_j} \right) d_j \\
+&= B_k d_j - \frac{(B_k d_j) (B_k d_j)^\top d_j}{d_j^\top B_k d_j} + \frac{y_j y_j^\top d_j}{y_j^\top d_j} \\
+&= y_j - \frac{y_j y_j^\top d_j}{y_j^\top d_j} + y_j \\
+&= y_j - y_j + y_j \\
+&= y_j
+\end{aligned} $$
+
+Since $j$ was arbitrary, we now have by induction that $B_{k+1} d_j = y_j$ for all $0 \leq j \leq k$, for all $0 \leq k \leq n$.
 
 
 #### (b)
@@ -181,10 +202,14 @@ _(Please see Appendix for associated code)_
 Returning to the quadratic problem defined in Part 3, we now use exact line search instead of backtracking line search at each step; i.e. we choose our step $\alpha$ to be
 
 $$
-\alpha = \inf \left\{ a \geq 0 \ : \ p'(a) = 0 \right\}
+\alpha = \inf \left\{ a \geq 0 \ : \ \phi'(a) = 0 \right\}
 $$
 
-where we define $p(a) = f(x + as)$. Note that $p'$ here is the derivative of $p$ with respect to $a$, and so by the chain rule, $p'(a) = s \cdot f'(x + as)$.
+where we define $\phi(a) = f(x + as)$. Note that $\phi'$ here is the derivative of $\phi$ with respect to $a$, and so by the chain rule,
+
+$$
+\phi'(a) = \frac{d}{da} f(x + as) = f'(x + as)^\top s
+$$
 
 The problem in question is 2-dimensional ($N = 2$), and therefore we expect that the algorithm will always terminate in at most two iterations. The following table shows that this is indeed the case for the range of initial guesses which were considered in Part 3. The "final error" is the Euclidean norm of the difference between the final iteration $x$ and the exact solution $x^* = (1, 0)^\top$.
 
@@ -197,6 +222,9 @@ $x_0^\top$  | Iterations | Final error
 (-2, 1)     | 2          | 1.665335e-16
 (-5, -5)    | 2          | 0.000000e+00
 (1e8, -1e8) | 2          | 1.535977e-08
+
+
+The solution path of the BFGS algorithm with exact line search, starting from an initial guess of $x_0 = (-1, 1)^\top$, is shown in Figure 3.
 
 
 ![Solution path for BFGS with exact line search, $x_0 = (-1, 1)^\top$](images/part5.png){width=80%}

@@ -90,7 +90,7 @@ TODO
 
 _(Please see Appendix for associated code)_
 
-The aim is to find an approximate minimum of the quadratic function $f(x) = \frac{1}{2} x^\top A x + b^\top x$ on $\mathbb{R}^2$, where
+In this section we attempt to find an approximate minimum of the quadratic function $f(x) = \frac{1}{2} x^\top A x + b^\top x$ on $\mathbb{R}^2$, where
 
 $$
 A = \begin{pmatrix} 2 & -1 \\ -1 & 10 \end{pmatrix} \qquad b = \begin{pmatrix} -2 \\ 1 \end{pmatrix}
@@ -101,7 +101,7 @@ $$
 The quasi-Newton BFGS algorithm is used to iteratively update an initial guess $x_0$. A descent direction is calculated and the step size $\alpha$ in that direction can be determined by a line search algorithm - in this case, backtracking line search, which starts with a relatively large initial guess for $\alpha$ and then halves it until the descent condition is met:
 
 $$
-f(x + \alpha s) - f(x) < \alpha \theta_{sd} f'(x)^\top s
+f(x + \alpha s) - f(x) < \theta_{sd} \alpha (f'(x)^\top s)
 $$
 
 for some specified constant $\theta_{sd}$. From previous work, we know $f'(x) = A x + b$.
@@ -130,12 +130,30 @@ The solution path of the BFGS algorithm with an initial guess of $x_0 = (-1, 1)^
 
 
 
-#### Part 4
+### Part 4
 
 _(Please see Appendix for associated code)_
 
-In this section we attempt to find an approximate minimum of the Rosenbrock function $f(x) = (1 - x_1)^2 + 10(x_2 - x_1^2)^2$.
+Similarly to Part 3, we now attempt to find an approximate minimum of the Rosenbrock function $f(x) = (1 - x_1)^2 + 10(x_2 - x_1^2)^2$ using the BFGS algorithm. However, in our search for the step size $\alpha$ at each iteration, we replace backtracking line search with Wolfe line search. Rather than simply reducing $\alpha$ until a suitable value is reached, Wolfe line search iteratively adjusts $\alpha$ by making increases or decreases (or a combination of both) until the following conditions, dependent on two specified parameters $\theta_{sd}$ and $\theta_c$, are both met:
 
+$$ \begin{aligned}
+&\textbf{Armijo condition} & &f(z + \alpha s) \leq f(z) + \theta_{sd} \alpha (f'(z)^\top s) \\
+&\textbf{Curvature condition} & &f'(z + \alpha s)^\top s \geq \theta_c (f'(z)^\top s)
+\end{aligned} $$
+
+As before, we compare the rate of convergence with the steepest descent (with backtracking) and trust region methods, though this time only for a pair of starting guesses.
+
+
+$x_0^\top$  | BFGS (Wolfe) | Steepest descent | Trust region
+------------|--------------|------------------|-------------
+(1, 1)      | 0            | 0                | 0
+(-1.2, 1)   | 19           | 1106             | 1006
+(-1.2, 1.5) | 15           | 1104             | 961
+
+
+Note that in terms of iterations, the improved BFGS method converges an order of magnitude faster than the other methods; although it is once again the case that all three algorithms converge in a similar period of time (~0.1 seconds, most likely for similar reasons to those discussed in Part 3.
+
+The solution path of the BFGS algorithm using Wolfe line search, with an initial guess of $x_0 = (-1.2, 1)^\top$, is shown in Figure 2.
 
 
 ![Solution path for BFGS with Wolfe line search, $x_0 = (-1.2, 1)^\top$](images/part4.png){width=80%}

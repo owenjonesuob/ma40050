@@ -81,8 +81,33 @@ Hence we have shown that $z^\top B_{n+1} z \geq 0$ for any $z \in \mathbb{R}^N$,
 
 #### (b)
 
-TODO
+Note that beginning with the definition of the BFGS update, we can write $B_{k+1}$ as
 
+$$ \begin{aligned}
+B_{k+1} &= B_k - \frac{(B_k d_k) (B_k d_k)^\top}{d_k^\top B_k d_k} + \frac{y_k y_k^\top}{y_k^\top d_k}  \\
+&= B_k + \begin{pmatrix} B_k d_k & y_k \end{pmatrix} \begin{pmatrix} \frac{-1}{d_k^\top B_k d_k} & 0 \\ 0 & \frac{1}{y_k^\top d_k} \end{pmatrix} \begin{pmatrix} (B_k d_k)^\top \\ y_k^\top \end{pmatrix} \\
+&= B_k + U_k V_k^\top
+\end{aligned} $$
+
+where we define $U_k = \begin{pmatrix} B_k d_k & y_k \end{pmatrix} \in \mathbb{R}^{N, 2}$ and $V_k^\top = \begin{pmatrix} \frac{-1}{d_k^\top B_k d_k} & 0 \\ 0 & \frac{1}{y_k^\top d_k} \end{pmatrix} \begin{pmatrix} (B_k d_k)^\top \\ y_k^\top \end{pmatrix} \in \mathbb{R}^{2, N}$.
+
+Then observe that, assuming that the SPD matrix $B_k$ is invertible and so the symmetric $B_k^{-1}$ exists,
+
+$$ \begin{aligned}
+I + V_k^\top B_k^{-1} U_k &= I + \begin{pmatrix} \frac{-1}{d_k^\top B_k d_k} & 0 \\ 0 & \frac{1}{y_k^\top d_k} \end{pmatrix} \begin{pmatrix} (B_k d_k)^\top \\ y_k^\top \end{pmatrix} B_k^{-1} \begin{pmatrix} B_k d_k & y_k \end{pmatrix} \\
+&= I \begin{pmatrix} \frac{-d_k^\top}{d_k^\top B_k d_k} \\ \frac{y_k^\top B_k^{-1}}{y_k^\top d_k} \end{pmatrix} \begin{pmatrix} B_k d_k & y_k \end{pmatrix} \\
+&= \begin{pmatrix} 0 & \frac{-d_k^\top y_k}{d_k^\top B_k d_k} \\ 1 & 1 + \frac{y_k^\top B_k^{-1} y_k}{y_k^\top d_k} \end{pmatrix}
+\end{aligned} $$
+
+Therefore taking the determinant,
+
+$$
+\det \left( I + V_k^\top B_k^{-1} U_k \right) = \frac{d_k^\top y_k}{d_k^\top B_k d_k}
+$$
+
+We have assumed that $d_k^\top y_k > 0$ for all $k \geq 0$, which as in part (a) necessitates $d_k \neq 0$; and since $B_k$ is SPD, we must have $d_k^\top B_k d_k > 0$. Therefore $\det \left( I + V_k^\top B_k^{-1} U_k \right) > 0$. In particular, $\det \left( I + V_k^\top B_k^{-1} U_k \right) \neq 0$, and therefore $I + V_k^\top B_k^{-1} U_k$ is invertible.
+
+Therefore the assumptions made in Part 1 hold for $A = B_k$ and $U, V^\top$ as defined earlier; therefore $B_k+1$ is invertible and we can apply the Sherman-Morrison-Woodbury formula to it, so long as $B_k$ is invertible. But notice that if we begin with some SPD $B_0 \in \mathbb{R}^{N, N}$, then since all SPD matrices are invertible, we have that $B_0$ is invertible, and therefore we have a proof for all $k > 0$ by induction.
 
 
 

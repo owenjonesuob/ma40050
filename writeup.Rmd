@@ -107,7 +107,7 @@ $$
 
 We have assumed that $d_k^\top y_k > 0$ for all $k \geq 0$, which as in part (a) necessitates $d_k \neq 0$; and since $B_k$ is SPD, we must have $d_k^\top B_k d_k > 0$. Therefore $\det \left( I + V_k^\top B_k^{-1} U_k \right) > 0$. In particular, $\det \left( I + V_k^\top B_k^{-1} U_k \right) \neq 0$, and therefore $I + V_k^\top B_k^{-1} U_k$ is invertible.
 
-Therefore the assumptions made in Part 1 hold for $A = B_k$ and $U, V^\top$ as defined earlier; therefore $B_k+1$ is invertible and we can apply the Sherman-Morrison-Woodbury formula to it, so long as $B_k$ is invertible. But notice that if we begin with some SPD $B_0 \in \mathbb{R}^{N, N}$, then since all SPD matrices are invertible, we have that $B_0$ is invertible, and therefore we have a proof for all $k > 0$ by induction.
+Therefore the assumptions made in Part 1 hold for $A = B_k$ and $U, V^\top$ as defined earlier; therefore $B_k+1$ is invertible and we can apply the Sherman-Morrison-Woodbury formula to it, so long as $B_k$ is invertible. But notice that if we begin with some SPD $B_0 \in \mathbb{R}^{N, N}$, then since all SPD matrices are invertible, we have that $B_0$ is invertible, and therefore we have a proof for all $k \geq 0$ by induction.
 
 
 
@@ -126,10 +126,10 @@ $$
 The quasi-Newton BFGS algorithm is used to iteratively update an initial guess $x_0$. A descent direction is calculated and the step size $\alpha$ in that direction can be determined by a line search algorithm - in this case, backtracking line search, which starts with a relatively large initial guess for $\alpha$ and then halves it until the descent condition is met:
 
 $$
-f(x + \alpha s) - f(x) < \theta_{sd} \alpha (f'(x)^\top s)
+f(x + \alpha s) - f(x) < \theta_{sd} \alpha (\nabla f(x)^\top s)
 $$
 
-for some specified constant $\theta_{sd}$. From previous work, we know $f'(x) = A x + b$.
+for some specified constant $\theta_{sd}$. From previous work, we know $\nabla f(x) = A x + b$.
 
 The following table shows the number of iterations the algorithm completes before convergence is achieved for a range of starting guesses $x_0$, using $\theta_{sd} = 0.1$, an initial approximate Hessian $B_0 = I$ and a convergence tolerance of $\epsilon = 10^{-5}$. The number of iterations performed by steepest descent (also with backtracking line search) and a simple Cauchy point trust region method are also shown.
 
@@ -162,8 +162,8 @@ _(Please see Appendix for associated code)_
 Similarly to Part 3, we now attempt to find an approximate minimum of the Rosenbrock function $f(x) = (1 - x_1)^2 + 10(x_2 - x_1^2)^2$ using the BFGS algorithm. However, in our search for the step size $\alpha$ at each iteration, we replace backtracking line search with Wolfe line search. Rather than simply reducing $\alpha$ until a suitable value is reached, Wolfe line search iteratively adjusts $\alpha$ by making increases or decreases (or a combination of both) until the following conditions, dependent on two specified parameters $\theta_{sd}$ and $\theta_c$, are both met:
 
 $$ \begin{aligned}
-&\textbf{Armijo condition} & &f(z + \alpha s) \leq f(z) + \theta_{sd} \alpha (f'(z)^\top s) \\
-&\textbf{Curvature condition} & &f'(z + \alpha s)^\top s \geq \theta_c (f'(z)^\top s)
+&\textbf{Armijo condition} & &f(z + \alpha s) \leq f(z) + \theta_{sd} \alpha (\nabla f(z)^\top s) \\
+&\textbf{Curvature condition} & &\nabla f(z + \alpha s)^\top s \geq \theta_c (\nabla f(z)^\top s)
 \end{aligned} $$
 
 As before, we compare the rate of convergence with the steepest descent (with backtracking) and trust region methods, though this time only for a pair of starting guesses.
@@ -214,9 +214,11 @@ B_{k+1} d_j &= \left( B_k - \frac{(B_k d_j) (B_k d_j)^\top}{d_j^\top B_k d_j} + 
 Since $j$ was arbitrary, we now have by induction that $B_{k+1} d_j = y_j$ for all $0 \leq j \leq k$, for all $0 \leq k \leq n$.
 
 
+
+
 #### (b)
 
-TODO
+Noting that $d_k^\top A d_j = \alpha_k \alpha_j s_k^\top A s_j$, it follows immediately from part (a) that $s_k^\top A s_j = 0$, i.e. $s_k$ and $s_j$ are orthogonal in the $A$-norm for all $j \neq k$. Since $A \in \mathbb{R}^{N, N}$ we can only have a maximum of $N$ such orthogonal vectors; in other words, there can be a maximum of $N$ search directons, and therefore a maximum of $N$ iterations can occur before convergence of the algorithm.
 
 
 
@@ -233,7 +235,7 @@ $$
 where we define $\phi(a) = f(x + as)$. Note that $\phi'$ here is the derivative of $\phi$ with respect to $a$, and so by the chain rule,
 
 $$
-\phi'(a) = \frac{d}{da} f(x + as) = f'(x + as)^\top s
+\phi'(a) = \frac{d}{da} f(x + as) = \nabla f(x + as)^\top s
 $$
 
 The problem in question is 2-dimensional ($N = 2$), and therefore we expect that the algorithm will always terminate in at most two iterations. The following table shows that this is indeed the case for the range of initial guesses which were considered in Part 3. The "final error" is the Euclidean norm of the difference between the final iteration $x$ and the exact solution $x^* = (1, 0)^\top$.
